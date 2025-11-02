@@ -1,0 +1,18 @@
+{
+  "month": "2025-01",
+  "totalSpend": 4120,
+  "byCategory": [
+    { "category": "Housing", "amount": 1800 },
+    { "category": "Groceries", "amount": 620 },
+    { "category": "Dining", "amount": 280 },
+    { "category": "Transportation", "amount": 220 },
+    { "category": "Discretionary", "amount": 400 }
+  ],
+  "budgets": [
+    { "category": "Housing", "cap": 1800, "spent": 1800 },
+    { "category": "Groceries", "cap": 700, "spent": 620 },
+    { "category": "Dining", "cap": 350, "spent": 280 },
+    { "category": "Transportation", "cap": 250, "spent": 220 },
+    { "category": "Discretionary", "cap": 500, "spent": 400 }
+  ]
+}

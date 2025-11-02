@@ -1,0 +1,31 @@
+{
+  "productName": "Artha OS",
+  "version": "0.1.0",
+  "identifier": "com.artha.local",
+  "build": {
+    "beforeBuildCommand": "npm run build --prefix ../app",
+    "beforeDevCommand": "npm run dev --prefix ../app -- --host",
+    "devPath": "http://localhost:5173",
+    "distDir": "../app/dist"
+  },
+  "tauri": {
+    "macOSPrivateApi": true,
+    "allowlist": {
+      "all": true
+    },
+    "bundle": {
+      "active": true,
+      "identifier": "com.artha.local",
+      "targets": [
+        "app"
+      ],
+      "icon": [
+        "icons/icon.icns",
+        "icons/icon.png"
+      ]
+    },
+    "updater": {
+      "active": false
+    }
+  }
+}

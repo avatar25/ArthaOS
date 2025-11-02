@@ -1,0 +1,3 @@
+[workspace]
+members = ["local", "core"]
+resolver = "2"
