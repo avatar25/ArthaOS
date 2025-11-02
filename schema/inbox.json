@@ -1,0 +1,26 @@
+[
+  {
+    "tempId": "1",
+    "date": "2025-01-04",
+    "description": "Blue Bottle Coffee",
+    "amount": -8.5,
+    "flow": "debit",
+    "suggestedCategory": "Dining"
+  },
+  {
+    "tempId": "2",
+    "date": "2025-01-04",
+    "description": "Amazon Web Services",
+    "amount": -32.25,
+    "flow": "debit",
+    "suggestedCategory": "Software"
+  },
+  {
+    "tempId": "3",
+    "date": "2025-01-03",
+    "description": "United Airlines",
+    "amount": -412.33,
+    "flow": "debit",
+    "suggestedCategory": "Travel"
+  }
+]

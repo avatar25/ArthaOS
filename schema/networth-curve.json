@@ -1,0 +1,7 @@
+[
+  { "date": "2024-02-01", "netWorth": 50500, "cash": 21000, "invested": 32000, "debt": 15000 },
+  { "date": "2024-03-01", "netWorth": 51750, "cash": 21500, "invested": 32800, "debt": 14900 },
+  { "date": "2024-04-01", "netWorth": 52900, "cash": 22000, "invested": 33600, "debt": 14800 },
+  { "date": "2024-05-01", "netWorth": 54150, "cash": 22500, "invested": 34500, "debt": 14600 },
+  { "date": "2024-06-01", "netWorth": 55400, "cash": 23000, "invested": 35400, "debt": 14500 }
+]
