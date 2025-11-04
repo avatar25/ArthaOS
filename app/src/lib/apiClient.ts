@@ -1,13 +1,13 @@
 import { invokeNative } from './nativeBridge'
 
-export type SummaryResponse = {
+export interface SummaryResponse {
   month: string
   totalSpend: number
   byCategory: Array<{ category: string; amount: number }>
   budgets: Array<{ category: string; cap: number; spent: number }>
 }
 
-export type NetWorthPoint = {
+export interface NetWorthPoint {
   date: string
   netWorth: number
   cash: number
@@ -15,7 +15,7 @@ export type NetWorthPoint = {
   debt: number
 }
 
-export type InboxItem = {
+export interface InboxItem {
   tempId: string
   date: string
   description: string
@@ -24,17 +24,17 @@ export type InboxItem = {
   suggestedCategory: string | null
 }
 
-export type InboxCommitResponse = {
+export interface InboxCommitResponse {
   committedCount: number
 }
 
-export type SetCategoryResponse = {
+export interface SetCategoryResponse {
   ok: true
 }
 
 export type TransportMode = 'local' | 'remote'
 
-type ApiImplementation = {
+export interface ApiClient {
   getSummary: (month: string) => Promise<SummaryResponse>
   getNetWorthCurve: () => Promise<NetWorthPoint[]>
   getInbox: () => Promise<InboxItem[]>
@@ -42,6 +42,8 @@ type ApiImplementation = {
   setInboxCategory: (tempId: string, category: string) => Promise<SetCategoryResponse>
   commitInbox: () => Promise<InboxCommitResponse>
 }
+
+type ApiImplementation = ApiClient
 
 let transportMode: TransportMode = 'local'
 
@@ -199,7 +201,7 @@ const transports: Record<TransportMode, ApiImplementation> = {
   remote: remoteTransport,
 }
 
-export const apiClient: ApiImplementation = {
+export const apiClient: ApiClient = {
   getSummary: (month) => transports[transportMode].getSummary(month),
   getNetWorthCurve: () => transports[transportMode].getNetWorthCurve(),
   getInbox: () => transports[transportMode].getInbox(),
