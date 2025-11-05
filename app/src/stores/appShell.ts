@@ -16,10 +16,10 @@ interface AppShellState {
 export const useAppShellStore = create<AppShellState>((set) => ({
   activeView: 'dashboard',
   theme: 'system',
-  isLocked: true,
+  isLocked: false,
   setActiveView: (view) => set({ activeView: view }),
   setTheme: (theme) => set({ theme }),
-  lock: () => set({ isLocked: true }),
+  lock: () => set({ isLocked: false }),
   unlock: () => set({ isLocked: false }),
 }))
 
