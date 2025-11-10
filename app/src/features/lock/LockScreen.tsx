@@ -62,7 +62,7 @@ export const LockScreen = () => {
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-brand-400">
             Artha OS
           </p>
-          <h1 className="mt-2 text-3xl font-semibold text-white">Unlock your vault</h1>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-100">Unlock your vault</h1>
           <p className="mt-2 text-sm text-slate-400">{message}</p>
         </div>
         <div className="mb-6 inline-flex rounded-full border border-slate-800 bg-slate-900/80 p-1 text-xs font-semibold">
@@ -106,7 +106,7 @@ export const LockScreen = () => {
               <input
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
-                className="mt-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-white focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-300/60"
+                className="mt-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-300/60"
                 placeholder="demo@artha"
               />
             </label>
@@ -116,7 +116,7 @@ export const LockScreen = () => {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="mt-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-white focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-300/60"
+                className="mt-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-300/60"
                 placeholder="•••••••"
               />
             </label>

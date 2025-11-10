@@ -31,7 +31,7 @@ export const Sidebar = () => {
             onClick={() => setActiveView(item.id)}
             className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               isActive
-                ? 'bg-slate-800 text-white shadow-card'
+                ? 'bg-slate-800 text-slate-100 shadow-card'
                 : 'text-slate-400 hover:bg-slate-900 hover:text-slate-100'
             }`}
           >
@@ -46,7 +46,7 @@ export const Sidebar = () => {
   )
 
   return (
-    <aside className="flex w-64 flex-col gap-6 border-r border-slate-900 bg-slate-950/80 p-6 backdrop-blur">
+    <aside className="sidebar-surface flex w-64 flex-col gap-6 border-r border-slate-900 bg-slate-950/80 p-6 backdrop-blur">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-slate-300">Artha OS</p>
