@@ -170,8 +170,10 @@ const localTransport: ApiImplementation = {
 }
 
 const remoteTransport: ApiImplementation = {
-  async getSummary(_month) {
-    console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
+  async getSummary(month) {
+    console.warn(
+      `[apiClient] remote transport not implemented for ${month}, falling back to mock data.`,
+    )
     return mockSummary
   },
   async getNetWorthCurve() {

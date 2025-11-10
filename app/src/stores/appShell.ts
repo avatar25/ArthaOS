@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export type AppView = 'dashboard' | 'import' | 'settings'
-export type ThemeMode = 'system' | 'light' | 'dark'
+export type ThemeMode = 'system' | 'light' | 'dark' | 'colorful'
 export type AuthMethod = 'touch' | 'basic'
 
 interface AppShellState {
@@ -28,7 +28,7 @@ export const useAppShellStore = create<AppShellState>((set) => ({
   setAuthMethod: (method) => set({ authMethod: method }),
 }))
 
-export const resolveTheme = (theme: ThemeMode): 'light' | 'dark' => {
+export const resolveTheme = (theme: ThemeMode): 'light' | 'dark' | 'colorful' => {
   if (theme === 'system') {
     return window.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'

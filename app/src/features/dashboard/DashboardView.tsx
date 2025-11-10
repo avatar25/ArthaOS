@@ -55,7 +55,7 @@ export const DashboardView = () => {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
           Overview
         </p>
-        <h1 className="text-3xl font-semibold text-white">Dashboard</h1>
+        <h1 className="text-3xl font-semibold text-slate-100">Dashboard</h1>
         <p className="text-sm text-slate-500">{monthLabel}</p>
       </header>
 
@@ -66,7 +66,7 @@ export const DashboardView = () => {
               <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Cash balance
               </h2>
-              <p className="mt-2 text-2xl font-semibold text-white">
+              <p className="mt-2 text-2xl font-semibold text-slate-100">
                 {latestNetworth ? compactCurrency(latestNetworth.cash) : '—'}
               </p>
             </div>
@@ -85,7 +85,7 @@ export const DashboardView = () => {
               <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Invested assets
               </h2>
-              <p className="mt-2 text-2xl font-semibold text-white">
+              <p className="mt-2 text-2xl font-semibold text-slate-100">
                 {latestNetworth ? compactCurrency(latestNetworth.invested) : '—'}
               </p>
             </div>
@@ -104,7 +104,7 @@ export const DashboardView = () => {
               <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Total spend
               </h2>
-              <p className="mt-2 text-2xl font-semibold text-white">
+              <p className="mt-2 text-2xl font-semibold text-slate-100">
                 {summaryQuery.data ? currency(summaryQuery.data.totalSpend) : '—'}
               </p>
             </div>
@@ -123,7 +123,7 @@ export const DashboardView = () => {
         <div className="rounded-2xl border border-slate-900 bg-slate-900/80 p-6 shadow-card xl:col-span-2">
           <header className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-white">Net-worth curve</h2>
+              <h2 className="text-sm font-semibold text-slate-100">Net-worth curve</h2>
               <p className="text-xs text-slate-500">
                 Last 12 months · {latestNetworth ? currency(latestNetworth.netWorth) : '—'} current
               </p>
@@ -173,7 +173,7 @@ export const DashboardView = () => {
         <div className="rounded-2xl border border-slate-900 bg-slate-900/80 p-6 shadow-card">
           <header className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-white">Budgets</h2>
+              <h2 className="text-sm font-semibold text-slate-100">Budgets</h2>
               <p className="text-xs text-slate-500">Month-to-date progress</p>
             </div>
           </header>

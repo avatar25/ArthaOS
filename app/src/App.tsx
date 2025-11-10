@@ -23,7 +23,7 @@ const ViewRenderer = ({ view }: { view: AppView }) => {
 const AppShell = () => {
   const activeView = useAppShellStore((state) => state.activeView)
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100">
+    <div className="app-shell flex min-h-screen bg-slate-950 text-slate-100">
       <Sidebar />
       <ViewRenderer view={activeView} />
       <QuickAddModal />

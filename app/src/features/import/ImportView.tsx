@@ -75,7 +75,7 @@ export const ImportView = () => {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
           Inbox
         </p>
-        <h1 className="text-3xl font-semibold text-white">Import transactions</h1>
+        <h1 className="text-3xl font-semibold text-slate-100">Import transactions</h1>
         <p className="text-sm text-slate-500">
           Drag in CSV exports from your banks. They stay on-device. Suggested categories come from your local memory.
         </p>
@@ -97,7 +97,7 @@ export const ImportView = () => {
           onChange={onInputChange}
         />
         <span className="text-4xl">📄</span>
-        <p className="text-lg font-semibold text-white">Drop CSV here</p>
+        <p className="text-lg font-semibold text-slate-100">Drop CSV here</p>
         <p className="text-sm text-slate-400">
           or{' '}
           <label
@@ -116,7 +116,7 @@ export const ImportView = () => {
       <section className="rounded-2xl border border-slate-900 bg-slate-900/80 shadow-card">
         <header className="flex items-center justify-between border-b border-slate-900 bg-slate-900/40 px-6 py-4">
           <div>
-            <h2 className="text-sm font-semibold text-white">Inbox preview</h2>
+            <h2 className="text-sm font-semibold text-slate-100">Inbox preview</h2>
             <p className="text-xs text-slate-500">
               {inboxQuery.data?.length ?? 0} pending transactions
             </p>
@@ -167,7 +167,7 @@ export const ImportView = () => {
                           category: event.target.value,
                         })
                       }
-                      className="w-44 rounded-lg border border-slate-800 bg-slate-950 px-2 py-1 text-xs text-slate-200 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/40"
+                      className="w-44 rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-xs text-slate-200 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/40"
                     >
                       <option value="">Unassigned</option>
                       {CATEGORY_OPTIONS.map((category) => (
