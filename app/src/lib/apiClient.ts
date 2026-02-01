@@ -32,6 +32,16 @@ export interface SetCategoryResponse {
   ok: true
 }
 
+export interface AppSettings {
+  theme: string
+  accounts?: string
+}
+
+export interface BudgetConfig {
+  category: string
+  cap: number
+}
+
 export type TransportMode = 'local' | 'remote'
 
 export interface ApiClient {
@@ -41,6 +51,10 @@ export interface ApiClient {
   importCsv: (file: File) => Promise<InboxItem[]>
   setInboxCategory: (tempId: string, category: string) => Promise<SetCategoryResponse>
   commitInbox: () => Promise<InboxCommitResponse>
+  getAppSettings: () => Promise<AppSettings>
+  updateSetting: (key: string, value: string) => Promise<void>
+  getBudgets: () => Promise<BudgetConfig[]>
+  setBudget: (category: string, cap: number) => Promise<void>
 }
 
 type ApiImplementation = ApiClient
@@ -167,6 +181,20 @@ const localTransport: ApiImplementation = {
     mockInbox = []
     return response
   },
+  async getAppSettings() {
+    const response = await invokeNative<AppSettings>('get_app_settings')
+    return response ?? { theme: 'system' }
+  },
+  async updateSetting(key, value) {
+    await invokeNative<void>('update_setting', { key, value })
+  },
+  async getBudgets() {
+    const response = await invokeNative<BudgetConfig[]>('get_budget_configs')
+    return response ?? []
+  },
+  async setBudget(category, cap) {
+    await invokeNative<void>('set_budget_config', { category, cap })
+  },
 }
 
 const remoteTransport: ApiImplementation = {
@@ -196,6 +224,20 @@ const remoteTransport: ApiImplementation = {
     console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
     return localTransport.commitInbox()
   },
+  async getAppSettings() {
+    console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
+    return { theme: 'system' }
+  },
+  async updateSetting(key, value) {
+    console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
+  },
+  async getBudgets() {
+    console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
+    return []
+  },
+  async setBudget(category, cap) {
+    console.warn('[apiClient] remote transport not implemented, falling back to mock data.')
+  },
 }
 
 const transports: Record<TransportMode, ApiImplementation> = {
@@ -211,4 +253,8 @@ export const apiClient: ApiClient = {
   setInboxCategory: (tempId, category) =>
     transports[transportMode].setInboxCategory(tempId, category),
   commitInbox: () => transports[transportMode].commitInbox(),
+  getAppSettings: () => transports[transportMode].getAppSettings(),
+  updateSetting: (key, value) => transports[transportMode].updateSetting(key, value),
+  getBudgets: () => transports[transportMode].getBudgets(),
+  setBudget: (category, cap) => transports[transportMode].setBudget(category, cap),
 }

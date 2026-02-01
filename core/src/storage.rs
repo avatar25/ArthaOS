@@ -68,6 +68,11 @@ pub fn migrate(conn: &Connection) -> Result<()> {
             category TEXT PRIMARY KEY,
             cap REAL NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        );
     "#,
     )
     .context("Base schema migration failed")?;

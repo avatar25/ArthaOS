@@ -1,13 +1,17 @@
 mod categorization;
 mod csv_import;
 pub mod dto;
+
+mod settings;
 mod storage;
 
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 
 use anyhow::{anyhow, Context, Result};
 use categorization::{CategorizationMemory, SharedMemory};
-use dto::{InboxItem, NetWorthPoint, SetCategoryResponse, SummaryResponse};
+use dto::{
+    AppSettings, BudgetConfig, InboxItem, NetWorthPoint, SetCategoryResponse, SummaryResponse,
+};
 use parking_lot::RwLock;
 use r2d2::Pool;
 use r2d2_sqlite::SqliteConnectionManager;
@@ -352,6 +356,49 @@ impl ArthaCore {
             }
 
             Ok::<_, anyhow::Error>(curve)
+        })
+        .await
+        .map_err(|error| anyhow!("Blocking task failed: {error}"))?
+    }
+
+    pub async fn get_app_settings(&self) -> Result<AppSettings> {
+        let pool = self.pool.clone();
+        task::spawn_blocking(move || {
+            let conn = pool.get().context("Checkout failed during settings fetch")?;
+            settings::get_app_settings(&conn)
+        })
+        .await
+        .map_err(|error| anyhow!("Blocking task failed: {error}"))?
+    }
+
+    pub async fn update_setting(&self, key: &str, value: &str) -> Result<()> {
+        let key = key.to_string();
+        let value = value.to_string();
+        let pool = self.pool.clone();
+        task::spawn_blocking(move || {
+            let conn = pool.get().context("Checkout failed during setting update")?;
+            settings::set_setting(&conn, &key, &value)
+        })
+        .await
+        .map_err(|error| anyhow!("Blocking task failed: {error}"))?
+    }
+
+    pub async fn get_budget_configs(&self) -> Result<Vec<BudgetConfig>> {
+        let pool = self.pool.clone();
+        task::spawn_blocking(move || {
+            let conn = pool.get().context("Checkout failed during budget fetch")?;
+            settings::get_budgets(&conn)
+        })
+        .await
+        .map_err(|error| anyhow!("Blocking task failed: {error}"))?
+    }
+
+    pub async fn set_budget_config(&self, category: &str, cap: f64) -> Result<()> {
+        let category = category.to_string();
+        let pool = self.pool.clone();
+        task::spawn_blocking(move || {
+            let conn = pool.get().context("Checkout failed during budget update")?;
+            settings::set_budget(&conn, &category, cap)
         })
         .await
         .map_err(|error| anyhow!("Blocking task failed: {error}"))?
