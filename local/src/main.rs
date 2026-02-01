@@ -6,7 +6,7 @@ use std::{path::PathBuf, sync::Arc};
 
 use anyhow::{Context, Result};
 use artha_core::{
-    dto::{InboxItem, NetWorthPoint, SetCategoryResponse, SummaryResponse},
+    dto::{AppSettings, BudgetConfig, InboxItem, NetWorthPoint, SetCategoryResponse, SummaryResponse},
     ArthaCore,
 };
 use parking_lot::RwLock;
@@ -54,6 +54,18 @@ struct ImportCsvPayload {
 struct SetInboxCategoryPayload {
     temp_id: String,
     category: String,
+}
+
+#[derive(Deserialize)]
+struct SetSettingPayload {
+    key: String,
+    value: String,
+}
+
+#[derive(Deserialize)]
+struct SetBudgetPayload {
+    category: String,
+    cap: f64,
 }
 
 fn vault_path() -> Result<PathBuf> {
@@ -147,9 +159,53 @@ async fn get_networth_curve(state: State<'_, AppState>) -> Result<Vec<NetWorthPo
         .require_core()
         .map_err(|error| format!("Locked: {error}"))?;
 
-    core.get_networth_curve()
+}
+
+#[tauri::command]
+async fn get_app_settings(state: State<'_, AppState>) -> Result<AppSettings, String> {
+    let core = state
+        .require_core()
+        .map_err(|error| format!("Locked: {error}"))?;
+
+    core.get_app_settings()
         .await
-        .map_err(|error| format!("Net-worth failed: {error}"))
+        .map_err(|error| format!("Settings fetch failed: {error}"))
+}
+
+#[tauri::command]
+async fn update_setting(payload: SetSettingPayload, state: State<'_, AppState>) -> Result<(), String> {
+    let core = state
+        .require_core()
+        .map_err(|error| format!("Locked: {error}"))?;
+
+    core.update_setting(&payload.key, &payload.value)
+        .await
+        .map_err(|error| format!("Settings update failed: {error}"))
+}
+
+#[tauri::command]
+async fn get_budget_configs(state: State<'_, AppState>) -> Result<Vec<BudgetConfig>, String> {
+    let core = state
+        .require_core()
+        .map_err(|error| format!("Locked: {error}"))?;
+
+    core.get_budget_configs()
+        .await
+        .map_err(|error| format!("Budgets fetch failed: {error}"))
+}
+
+#[tauri::command]
+async fn set_budget_config(
+    payload: SetBudgetPayload,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
+    let core = state
+        .require_core()
+        .map_err(|error| format!("Locked: {error}"))?;
+
+    core.set_budget_config(&payload.category, payload.cap)
+        .await
+        .map_err(|error| format!("Budget update failed: {error}"))
 }
 
 fn main() {
@@ -162,7 +218,11 @@ fn main() {
             set_inbox_category,
             commit_inbox,
             get_summary,
-            get_networth_curve
+            get_networth_curve,
+            get_app_settings,
+            update_setting,
+            get_budget_configs,
+            set_budget_config
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,12 +1,15 @@
-import { useState } from 'react'
-import { useAppShellStore, type ThemeMode } from '../../stores/appShell'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
+import { apiClient } from '../../lib/apiClient'
 import { currency } from '../../lib/format'
+import { useAppShellStore, type ThemeMode } from '../../stores/appShell'
 
 const defaultBudgets = [
-  { category: 'Housing', cap: 1800, include: true },
-  { category: 'Groceries', cap: 700, include: true },
-  { category: 'Dining', cap: 350, include: true },
-  { category: 'Transportation', cap: 250, include: true },
+  { category: 'Housing', cap: 1800 },
+  { category: 'Groceries', cap: 700 },
+  { category: 'Dining', cap: 350 },
+  { category: 'Transportation', cap: 250 },
+  { category: 'Discretionary', cap: 500 },
 ]
 
 const defaultAccounts = [
@@ -46,27 +49,82 @@ const themeCards: ThemeCard[] = [
 ]
 
 export const SettingsView = () => {
+  const queryClient = useQueryClient()
   const theme = useAppShellStore((state) => state.theme)
   const setTheme = useAppShellStore((state) => state.setTheme)
-  const [budgets, setBudgets] = useState(defaultBudgets)
-  const [accounts, setAccounts] = useState(defaultAccounts)
+
+  // -- Queries --
+
+  const settingsQuery = useQuery({
+    queryKey: ['settings'],
+    queryFn: apiClient.getAppSettings,
+  })
+
+  const budgetsQuery = useQuery({
+    queryKey: ['budgets'],
+    queryFn: apiClient.getBudgets,
+  })
+
+  const accounts = settingsQuery.data?.accounts
+    // @ts-ignore
+    ? JSON.parse(settingsQuery.data.accounts)
+    : defaultAccounts as typeof defaultAccounts
+
+  // -- Mutations --
+
+  const updateSettingMutation = useMutation({
+    mutationFn: ({ key, value }: { key: string; value: string }) =>
+      apiClient.updateSetting(key, value),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+  })
+
+  const updateBudgetMutation = useMutation({
+    mutationFn: ({ category, cap }: { category: string; cap: number }) =>
+      apiClient.setBudget(category, cap),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] })
+      queryClient.invalidateQueries({ queryKey: ['summary'] }) // Affects dashboard
+    },
+  })
+
+  // -- Sync Effects --
+
+  useEffect(() => {
+    if (settingsQuery.data?.theme) {
+      setTheme(settingsQuery.data.theme as ThemeMode)
+    }
+  }, [settingsQuery.data?.theme, setTheme])
+
+  // -- Handlers --
+
+  const handleThemeChange = (newTheme: ThemeMode) => {
+    setTheme(newTheme) // Optimistic update
+    updateSettingMutation.mutate({ key: 'theme', value: newTheme })
+  }
+
+  const handleAccountToggle = (id: string) => {
+    const newAccounts = accounts.map((acc: any) =>
+      acc.id === id ? { ...acc, includeInLiquidity: !acc.includeInLiquidity } : acc,
+    )
+    updateSettingMutation.mutate({ key: 'accounts', value: JSON.stringify(newAccounts) })
+  }
+
+  const handleBudgetChange = (category: string, cap: number) => {
+    updateBudgetMutation.mutate({ category, cap })
+  }
+
   const isSystemTheme = theme === 'system'
 
-  const updateBudgetCap = (category: string, cap: number) => {
-    setBudgets((prev) =>
-      prev.map((budget) => (budget.category === category ? { ...budget, cap } : budget)),
-    )
-  }
+  // Combine default with persisted budgets to ensure we show basics if DB is empty
+  const displayBudgets = budgetsQuery.data?.length
+    ? budgetsQuery.data
+    : defaultBudgets
 
-  const toggleAccount = (id: string) => {
-    setAccounts((prev) =>
-      prev.map((account) =>
-        account.id === id
-          ? { ...account, includeInLiquidity: !account.includeInLiquidity }
-          : account,
-      ),
-    )
-  }
+  // If user adds a new budget category in implementation plan? No, plan said:
+  // "Change Housing budget to 2000... verify persistence"
+  // I will keep the existing table structure.
 
   return (
     <div className="flex flex-1 flex-col gap-6 bg-slate-950/60 p-10">
@@ -81,6 +139,7 @@ export const SettingsView = () => {
       </header>
 
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* Appearance Section */}
         <article className="rounded-2xl border border-slate-900 bg-slate-900/80 p-6 shadow-card">
           <h2 className="text-sm font-semibold text-slate-100">Appearance</h2>
           <p className="text-xs text-slate-500">
@@ -89,13 +148,12 @@ export const SettingsView = () => {
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => setTheme('system')}
+              onClick={() => handleThemeChange('system')}
               aria-pressed={isSystemTheme}
-              className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${
-                isSystemTheme
+              className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${isSystemTheme
                   ? 'border-brand-500 bg-brand-500/10 text-slate-100'
                   : 'border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-100'
-              }`}
+                }`}
             >
               Match macOS
             </button>
@@ -110,13 +168,12 @@ export const SettingsView = () => {
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setTheme(option.value)}
+                  onClick={() => handleThemeChange(option.value)}
                   aria-pressed={isActive}
-                  className={`flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition ${
-                    isActive
+                  className={`flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition ${isActive
                       ? 'border-brand-500 bg-brand-500/10'
                       : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div>
@@ -124,11 +181,10 @@ export const SettingsView = () => {
                       <p className="text-xs text-slate-500">{option.description}</p>
                     </div>
                     <span
-                      className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
-                        isActive
+                      className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${isActive
                           ? 'bg-brand-500 text-white'
                           : 'border border-slate-800 text-slate-500'
-                      }`}
+                        }`}
                     >
                       {isActive ? '✓' : option.label.charAt(0)}
                     </span>
@@ -149,25 +205,28 @@ export const SettingsView = () => {
           </div>
         </article>
 
+        {/* Accounts Section */}
         <article className="rounded-2xl border border-slate-900 bg-slate-900/80 p-6 shadow-card">
           <h2 className="text-sm font-semibold text-slate-100">Accounts</h2>
           <p className="text-xs text-slate-500">
             Toggle which accounts are included in liquidity calculations.
           </p>
           <div className="mt-4 space-y-3">
-            {accounts.map((account) => (
+            {accounts.map((account: any) => (
               <label
                 key={account.id}
                 className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900 px-4 py-3"
               >
                 <div>
                   <p className="text-sm font-medium text-slate-100">{account.name}</p>
-                  <p className="text-xs text-slate-500">{account.includeInLiquidity ? 'Included in liquidity' : 'Excluded'}</p>
+                  <p className="text-xs text-slate-500">
+                    {account.includeInLiquidity ? 'Included in liquidity' : 'Excluded'}
+                  </p>
                 </div>
                 <input
                   type="checkbox"
                   checked={account.includeInLiquidity}
-                  onChange={() => toggleAccount(account.id)}
+                  onChange={() => handleAccountToggle(account.id)}
                   className="h-5 w-5 rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-brand-400"
                 />
               </label>
@@ -176,6 +235,7 @@ export const SettingsView = () => {
         </article>
       </section>
 
+      {/* Budgets Section */}
       <section className="rounded-2xl border border-slate-900 bg-slate-900/80 p-6 shadow-card">
         <div className="flex items-center justify-between">
           <div>
@@ -184,15 +244,20 @@ export const SettingsView = () => {
               Caps per category for month-to-date spend tracking.
             </p>
           </div>
+          {/* Add Category button hidden as we stick to fixed set for now or mocked add? 
+              The previous implementation allowed adding mocked categories. 
+              I'll omit it for now as backend doesn't support "adding" logic implicitly without explicit endpoint in plan,
+              although setBudget upserts. So effectively we can add.
+              I will re-add the button but make it use setBudget('New Category', 0).
+          */}
           <button
             type="button"
             className="rounded-full border border-slate-800 px-3 py-1 text-xs text-slate-400 hover:border-slate-700 hover:text-slate-100"
-            onClick={() =>
-              setBudgets((prev) => [
-                ...prev,
-                { category: `New Category ${prev.length + 1}`, cap: 0, include: true },
-              ])
-            }
+            onClick={() => {
+              // Simple prompt for now or just generic name
+              const name = prompt('Category Name:')
+              if (name) updateBudgetMutation.mutate({ category: name, cap: 0 })
+            }}
           >
             + Add category
           </button>
@@ -207,15 +272,18 @@ export const SettingsView = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-900/60">
-              {budgets.map((budget) => (
+              {displayBudgets.map((budget) => (
                 <tr key={budget.category} className="bg-slate-900/40">
                   <td className="px-4 py-3 text-sm">{budget.category}</td>
                   <td className="px-4 py-3">
                     <input
                       type="number"
                       min={0}
-                      value={budget.cap}
-                      onChange={(event) => updateBudgetCap(budget.category, Number(event.target.value))}
+                      // Use local state? No, inputs are tricky with async updates.
+                      // Ideally use a local intermediate state for input control or onBlur.
+                      // For simplicity, using defaultValue and onBlur.
+                      defaultValue={budget.cap}
+                      onBlur={(e) => handleBudgetChange(budget.category, Number(e.target.value))}
                       className="w-32 rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-sm text-slate-200 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/40"
                     />
                   </td>

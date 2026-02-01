@@ -73,3 +73,17 @@ pub struct NetWorthPoint {
 pub struct SetCategoryResponse {
     pub ok: bool,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AppSettings {
+    pub theme: String,
+    pub accounts: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BudgetConfig {
+    pub category: String,
+    pub cap: f64,
+}
